@@ -1,13 +1,17 @@
 package com.ncs.airside.controller;
 
+import com.ncs.airside.service.AsyncService;
 import com.rfid.uhf.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class AntennaController {
@@ -17,19 +21,32 @@ public class AntennaController {
     @Autowired
     public Device reader;
 
+    @Value("${portNumber}")
+    private int Port;
+
+    @Autowired
+    private AsyncService service;
+
+    @GetMapping("/AsyncAntennaCall")
+    public void asyncAntennaCall() throws InterruptedException, ExecutionException
+    {
+        service.startAsyncAntennaRead();
+    }
+
     @GetMapping("/loadAntennaReader")
     public String load() {
 
+        logger.info("The portNumber is " +Port);
         System.loadLibrary("com_rfid_uhf_Device"); //read from resources folder
 
-        int Port = 1;//com1
+        //int Port = 1;//com1
         byte[] comAddr = new byte[1];
         comAddr[0] = (byte) 255;
         byte baud = 5;//57600bps
         int[] PortHandle = new int[1];
         //´®¿ÚÁ¬½Ó
         int result = reader.OpenComPort(1, comAddr, baud, PortHandle);
-        logger.info("Connection Result" + result);
+        logger.info("Connection Result " + result);
         if (result == 0) {
             byte[] versionInfo = new byte[2];
             byte[] readerType = new byte[1];
@@ -164,4 +181,24 @@ public class AntennaController {
         return "Success";
     }
 
+    @GetMapping("/AntennaRead")
+    public void read() {
+
+        int counter = 0;
+
+        while(true){
+
+            //dummy code to make a pause of 1 seconds
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ex){
+                //do nothing
+            }
+            logger.info(counter+". Antenna is reading...current thread name is "+Thread.currentThread().getName());
+            counter++;
+
+            //TODO need to add code to call library API for antenna to start reading.
+            //need enter code to call API library
+        }
+    }
 }

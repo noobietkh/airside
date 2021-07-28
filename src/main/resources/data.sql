@@ -1,4 +1,3 @@
-
 insert into billing_information values(987, 1, 65557812 , 'James' , 'R&D' );
 insert into billing_information values(876, 2, 66667812 , 'Michael' , 'Technology' );
 insert into billing_information values(765, 3, 67777812 , 'Wendy' , 'Sales' );
